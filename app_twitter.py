@@ -29,7 +29,7 @@ app.layout = html.Div([html.Div(html.H1("Twitter Likes Analysis of Famous People
                                                  value=["taylorswift13", "cristiano", "jtimberlake"],
                                                  style={"color": "green"}), className="four columns"),
                            html.Div(dcc.Dropdown(), className="four columns"),
-                           html.Div(dcc.Dropdown(id="my-dropdown", multi=True,
+                           html.Div(dcc.Dropdown(id="my-second-dropdown", multi=True,
                                                  options=[{"label": "Taylor", "value": "taylorswift13"},
                                                           {"label": "Ronaldo", "value": "cristiano"}],
                                                  style={"color": "green"}), className="four columns"),
@@ -38,6 +38,31 @@ app.layout = html.Div([html.Div(html.H1("Twitter Likes Analysis of Famous People
                                                             style={"color": "red", "backgroundColor": "yellow",
                                                                    "fontSize": "40px"}),
                                                      className="row")])
+
+
+@app.callback(Output(component_id="line-chart", component_property="figure"),
+              [Input(component_id="my-dropdown", component_property="value")])
+def update_graph(chosen_values):
+    print(f"Values chosen by user: {chosen_values}")
+
+    if len(chosen_values) == 0:
+        return {}
+    else:
+        df_filtered = df[df["name"].isin(chosen_values)]
+        fig = px.line(
+            data_frame=df_filtered,
+            x="date_time",
+            y="number_of_likes",
+            color="name",
+            log_y=True,
+            labels={
+                "number_of_likes": "Likes",
+                "date_time": "Date",
+                "name": "Celebrity",
+            },
+        )
+        return fig
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)
